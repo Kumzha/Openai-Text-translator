@@ -14,6 +14,9 @@
       display: flex;
       flex-direction: column;
     }
+    h1{
+        padding-top: 50px;
+    }
     .content {
       flex: 1;
     }
@@ -55,6 +58,9 @@
       text-align: center;
       margin-top: 20px;
     }
+    .form-group{
+        margin: 20px 0px 20px 0px;
+    }
   </style>
   </head>
   <body>
@@ -77,7 +83,7 @@
                     <input type="text" class="form-control" id="languages" placeholder="e.g., es,fr,lt">
                 </div>
 
-                <button type="button" class ="btn btn-primary translate-button" onclick = "submitTranslation()">Translate</button>
+                <button id="translate-button" type="button" class ="btn btn-primary translate-button" onclick = "submitTranslation()">Translate</button>
             </form>
 
             <div class = "mt-4" id="results" style="display: none;">
@@ -95,8 +101,8 @@
             <div class="mt-4">
                 <label for="search-id">Check Translation by ID</label>
                 <input type="number" id="search-id" class="form-control" placeholder="Enter Translation ID">
-                <button id="search-button" class="btn btn-info mt-2" onclick ="cheackTranslationStatus()">Check Status</button> 
-                <button id="content-button" class="btn btn-secondary mt-2" onclick ="cheackTranslationContent()">Check Content</button> 
+                <button id="search-button" class="btn btn-info mt-2" onclick ="checkTranslationStatus()">Check Status</button> 
+                <button id="content-button" class="btn btn-secondary mt-2" onclick ="checkTranslationContent()">Check Content</button> 
 
             </div>
 
@@ -114,6 +120,76 @@
 
             <script>
 
+                async function submitTranslation(){
+
+                    const text = document.getElementById('textToTranslate').value;
+                    const languages = document.getElementById('languages').value.split(',').map(lang=>lang.trim());
+
+
+                    if(!text||!languages[0]){
+                        alert("Provide both text and taget language.");
+                        return;
+                    }
+                    
+                    const progressBar = document.getElementById('progress-bar');
+                    const progressText = document.getElementById('progress-text');
+
+                    progressBar.classList.remove('bg-success');
+                    progressBar.classList.add('bg-primary');
+                    progressText.textContent = 'Translation in progress...';
+
+                    try{
+                        const response = await axios.post('localhost:3000/translate',{
+                            text: text,
+                            languages: languages
+                        });
+
+                        const taskId = response.data.task_id;
+                        alert(`Task ID: ${taskID}`);
+
+                        document.getElementById('progress-container').style.display = 'block';
+                        document.getElementById('result').style.display = 'none';
+                        document.getElementById('status-container').style.display = 'none';
+                        document.getElementById('content-container').style.display='none';
+
+                        let translationResult = null;
+                        let progress = 0;
+                        
+                        while(progress<100){
+                            await new Promise(resolve => setTimeout(resolve, 1000));
+                            const resultResponse = await axios.get(`localhost:3000/translate)${taskId}`);
+                            translationResult = resultResponse.data;
+
+                            if(translationResult === 'completed'){
+                                progress = 100;
+                            }else{
+                                progres.style.width = '50%'
+                            }
+
+                        }
+
+                            progressBar.classList.remove('bg-primary');
+                            progressBar.classList.add('bg-success');
+                            progressBar.style.width = '100%';
+                            progressText.textContent = 'Translation complete!';
+
+                            document.getElementById('translationResults').textContent = JSON.stringify(translationResult.translations);
+                            document.getElementById('results').style.display="block";
+
+                    }       
+                    catch{
+                        console.error("Error submiting translation");
+                        alert("An error occured while translating, please try again");
+                    }
+
+                    async function checkTranslationStatus(){
+                        return;
+                    }
+
+                    async function checkTranslationStatus(){
+                        return;
+                    }
+                }
 
             </script>
   </body>
