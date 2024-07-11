@@ -4,6 +4,7 @@ import models
 def create_translation_task(db:Session, text:str, languages: list):
     task = models.TranslationTask(text=text, languages=languages)
 
+    print('addded to db')
     db.add(task)
     db.commit()
     db.refresh(task)
