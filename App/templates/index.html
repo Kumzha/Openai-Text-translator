@@ -181,45 +181,46 @@
                     progressBar.classList.remove('bg-success');
                     progressBar.classList.add('bg-primary');
                     progressText.textContent = 'Translation in progress...';
-                    console.log('1')
 
                     await axios.post('http://localhost:5000/translate', {
                             text: text,
                             languages: languages
                       })
                       .then(response => {
-                        console.log('3')
                         console.log(response.data)
                         resp = response.data;
                       })
                       .catch(error => {
                         console.error("Neprisijunge", error)
                       })
-
-                      console.log('2')
-
+                   
                         const taskId = resp.task_id;
-                        alert(`Task ID: ${taskID}`);
+                        alert(`Task ID: ${taskId}`);
 
-                        console.log('work6')
                         document.getElementById('progress-container').style.display = 'block';
-                        document.getElementById('result').style.display = 'none';
+                        document.getElementById('results').style.display = 'none';
                         document.getElementById('status-container').style.display = 'none';
                         document.getElementById('content-container').style.display='none';
 
                         let translationResult = null;
                         let progress = 0;
                         
-                        console.log('work7')
                         while(progress<100){
                             await new Promise(resolve => setTimeout(resolve, 1000));
-                            const resultResponse = await axios.get(`http://localhost:5000/translate)${taskId}`);
-                            translationResult = resultResponse.data;
-                            if(translationResult === 'completed'){
+                          
+                            await axios.get(`http://localhost:5000/translate/${taskId}`)
+                            .then(response => {
+                              translationResult = response.data;
+                              if(translationResult.status == 'completed'){
                                 progress = 100;
-                            }else{
-                                progres.style.width = '50%'
-                            }
+                              }else{
+                                progressBar.style.width = '50%'
+                              }
+                              console.log(response.data);
+                            })
+                            .catch(error => {
+                              console.error('Error fetching data for ID: ', error);
+                            })
 
                         }
 
@@ -228,7 +229,7 @@
                             progressBar.style.width = '100%';
                             progressText.textContent = 'Translation complete!';
 
-                            document.getElementById('translationResults').textContent = JSON.stringify(translationResult.translations);
+                            document.getElementById('translationResults').textContent = JSON.stringify(translationResult.translations)
                             document.getElementById('results').style.display="block";
 
                       }     

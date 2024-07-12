@@ -1,10 +1,6 @@
 from pydantic import BaseModel
 from typing import List, Dict
 
-
-
-#Learn what schemas are(Done!)
-
 class TranslationRequest(BaseModel):
     text: str
     languages: List[str]
