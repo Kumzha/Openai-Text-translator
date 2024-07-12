@@ -201,6 +201,7 @@
                         const taskId = resp.task_id;
                         alert(`Task ID: ${taskID}`);
 
+                        console.log('work6')
                         document.getElementById('progress-container').style.display = 'block';
                         document.getElementById('result').style.display = 'none';
                         document.getElementById('status-container').style.display = 'none';
@@ -209,11 +210,11 @@
                         let translationResult = null;
                         let progress = 0;
                         
+                        console.log('work7')
                         while(progress<100){
                             await new Promise(resolve => setTimeout(resolve, 1000));
                             const resultResponse = await axios.get(`http://localhost:5000/translate)${taskId}`);
                             translationResult = resultResponse.data;
-
                             if(translationResult === 'completed'){
                                 progress = 100;
                             }else{

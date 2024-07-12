@@ -24,6 +24,13 @@ templates = Jinja2Templates(directory="templates")
 #     allow_methods=["*"],
 #     allow_header=["*"],
 # )
+# app.app_middleware(
+#     CORSMiddleware,
+#     allow_origins=["*"],
+#     allow_credential=True,
+#     allow_methods=["*"],
+#     allow_header=["*"],
+# )
 
 
 
