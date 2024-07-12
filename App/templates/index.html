@@ -62,6 +62,10 @@
         margin: 20px 0px 20px 0px;
     }
   </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
   </head>
   <body>
     <nav class = "navbar navbar-expand lg navbar-dark bg-primary fixed-top">
@@ -82,7 +86,8 @@
                     <label for="languages">Languages(comma-seperated>)</label> 
                     <input type="text" class="form-control" id="languages" placeholder="e.g., es,fr,lt">
                 </div>
-
+                <button id="test-button1" type="button" class ="btn btn-primary translate-button" onclick ="testGetFunction()">Test Get Button</button>
+                <button id="test-button2" type="button" class ="btn btn-primary translate-button" onclick ="testPostFunction()">Test Post Button</button>
                 <button id="translate-button" type="button" class ="btn btn-primary translate-button" onclick = "submitTranslation()">Translate</button>
             </form>
 
@@ -117,8 +122,46 @@
             </div>
 
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
             <script>
+              
+
+                async function testGetFunction(){
+
+                  console.log("Test Get pressed");
+                          await axios.get('http://localhost:5000/test')
+                            .then(response => {
+                              console.log(response.data);
+                            })
+                            .catch(error => {
+                              console.error('Error fetching data: ', error);
+                            })
+
+                }
+
+                async function testPostFunction(){
+                    console.log("Test Post pressed");
+
+                    var resp = null;
+                    const text = document.getElementById('textToTranslate').value;
+                    const languages = document.getElementById('languages').value.split(',').map(lang=>lang.trim());
+
+                    await axios.post('http://localhost:5000/test', {
+                            text: text,
+                            languages: languages
+                    })
+                      .then(response => {
+                        console.log(response.data)
+                        resp = response.data
+                      })
+                      .catch(error => {
+                        console.error("Error", error)
+                      })
+
+                      
+
+                }
 
                 async function submitTranslation(){
 
@@ -131,20 +174,31 @@
                         return;
                     }
                     
+                    var resp = null;
                     const progressBar = document.getElementById('progress-bar');
                     const progressText = document.getElementById('progress-text');
 
                     progressBar.classList.remove('bg-success');
                     progressBar.classList.add('bg-primary');
                     progressText.textContent = 'Translation in progress...';
+                    console.log('1')
 
-                    try{
-                        const response = await axios.post('localhost:3000/translate',{
+                    await axios.post('http://localhost:5000/translate', {
                             text: text,
                             languages: languages
-                        });
+                      })
+                      .then(response => {
+                        console.log('3')
+                        console.log(response.data)
+                        resp = response.data;
+                      })
+                      .catch(error => {
+                        console.error("Neprisijunge", error)
+                      })
 
-                        const taskId = response.data.task_id;
+                      console.log('2')
+
+                        const taskId = resp.task_id;
                         alert(`Task ID: ${taskID}`);
 
                         document.getElementById('progress-container').style.display = 'block';
@@ -157,7 +211,7 @@
                         
                         while(progress<100){
                             await new Promise(resolve => setTimeout(resolve, 1000));
-                            const resultResponse = await axios.get(`localhost:3000/translate)${taskId}`);
+                            const resultResponse = await axios.get(`http://localhost:5000/translate)${taskId}`);
                             translationResult = resultResponse.data;
 
                             if(translationResult === 'completed'){
@@ -176,11 +230,8 @@
                             document.getElementById('translationResults').textContent = JSON.stringify(translationResult.translations);
                             document.getElementById('results').style.display="block";
 
-                    }       
-                    catch{
-                        console.error("Error submiting translation");
-                        alert("An error occured while translating, please try again");
-                    }
+                      }     
+                    
 
                     async function checkTranslationStatus(){
                         return;
@@ -189,7 +240,7 @@
                     async function checkTranslationStatus(){
                         return;
                     }
-                }
+                
 
             </script>
   </body>

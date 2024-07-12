@@ -6,7 +6,7 @@ Base = declarative_base()
 class TranslationTask(Base):
     __tablename__ = "translation_tasks"
 
-    id=Column(Integer, primary_key = True, index = True)
+    id=Column(Integer, primary_key = True, index = True, autoincrement=True)
     text = Column(Text, nullable=False)
     languages = Column(JSON, nullable = False)
     status = Column(String, default="in progress")
